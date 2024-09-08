@@ -17,4 +17,4 @@ export type AssetTransferBody = {
 
 export type AssetTransferRequest = Request<{}, {}, AssetTransferBody>;
 
-export type ClerkRequest = Request & { clerkEvent?: WebhookEvent }
+export type ClerkEventProp = { clerkEvent?: WebhookEvent };

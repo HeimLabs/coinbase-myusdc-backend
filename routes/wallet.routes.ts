@@ -1,9 +1,10 @@
 import { Router } from "express";
-import { getWallet, transferAsset } from "../controllers";
+import { getUser, transferAsset } from "../controllers";
+import { ClerkExpressRequireAuth } from "@clerk/clerk-sdk-node";
 
 const walletRouter = Router();
 
-walletRouter.get("/", getWallet);
+walletRouter.get("/user", ClerkExpressRequireAuth(), getUser);
 walletRouter.post("/transfer-asset", transferAsset);
 
 export default walletRouter;

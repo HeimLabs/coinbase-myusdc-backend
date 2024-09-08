@@ -1,10 +1,9 @@
-import { NextFunction, Response } from "express";
-import { ClerkRequest } from "../types/api.types";
+import { NextFunction, Response, Request } from "express";
 import { UserModel } from "../models/User.model";
 import { Coinbase } from "@coinbase/coinbase-sdk";
 import { coinbase } from "../services";
 
-export async function handleWebhook(req: ClerkRequest, res: Response, next: NextFunction) {
+export async function handleWebhook(req: Request, res: Response, next: NextFunction) {
     try {
         if (req.clerkEvent?.type === "user.created") {
             const userData = req.clerkEvent.data;

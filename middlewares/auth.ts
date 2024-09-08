@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import AppError from "../utils/appError";
 import { Webhook } from "svix";
 import { WebhookEvent } from "@clerk/clerk-sdk-node";
-import { ClerkRequest } from "types/api.types";
 
 export const clerkWebhookAuth = async (request: Request, response: Response, next: NextFunction) => {
     try {
@@ -22,7 +21,7 @@ export const clerkWebhookAuth = async (request: Request, response: Response, nex
             'svix-signature': svix_signature,
         }) as WebhookEvent;
 
-        (request as ClerkRequest).clerkEvent = event;
+        request.clerkEvent = event;
 
         next();
     } catch (err) {

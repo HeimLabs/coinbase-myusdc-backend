@@ -1,17 +1,39 @@
 import { NextFunction, Request, Response } from "express";
 import AppError from "../utils/appError";
-// import { wallet as CoinbaseWallet } from "../services/coinbase.services";
 import { AssetTransferRequest } from "types/api.types";
 import { Coinbase } from "@coinbase/coinbase-sdk";
+import { UserModel } from "../models/User.model";
+import { coinbase } from "../services";
 
-export async function getWallet(req: Request, res: Response, next: NextFunction) {
+export async function getUser(req: Request, res: Response, next: NextFunction) {
     try {
-        // const addressData = CoinbaseWallet.getDefaultAddress();
+        let user = await UserModel.findOne({ userId: req.auth.userId });
 
-        // return res.status(200).json({
-        //     address: addressData?.getId(),
-        //     chain: addressData?.getNetworkId()
-        // });
+        if (!user)
+            throw new AppError(404, "error", "User not found");
+
+        // @review - If user doesn't exist? Create User?
+        // @review - ONLY Create user here instead of webhook?
+        
+        // If wallet doesn't exist, create wallet
+        if (!user.wallet) {
+            try {
+                const wallet = await coinbase.createWalletForUser(user);
+
+                // Fund the wallet
+                try {
+                    await coinbase.fundWallet(wallet, Coinbase.assets.Usdc);
+                } catch (err) {
+                    console.error(`[controllers/wallet/getUser] Failed to fund wallet |  User: ${user.userId}`);
+                    console.error(err);
+                }
+            } catch (err) {
+                console.error(`[controllers/wallet/getUser] Failed to create wallet |  User: ${user.userId}`);
+                console.error(err);
+            }
+        }
+
+        return res.status(200).json(user);
     } catch (error) {
         next(error);
     }
