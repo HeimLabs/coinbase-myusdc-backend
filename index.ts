@@ -3,6 +3,7 @@ import middlewares from "./middlewares";
 import router from "./routes";
 import express from "express";
 import { database } from "./services";
+import { ServerSigner } from "@coinbase/coinbase-sdk";
 
 const start = async () => {
     let app = express();
@@ -15,7 +16,10 @@ const start = async () => {
     app.listen(process.env.PORT || 5000, async () => {
         try {
             console.log(`🚀 Server running on port ${process.env.PORT || 5000}`);
+            if (await ServerSigner.getDefault())
+                console.log("✅ Coinbase ServerSigner connected!");
         } catch (error) {
+            console.log("❌ Coinbase ServerSigner failed to connect!");
             await gracefulShutdown();
         }
     });
