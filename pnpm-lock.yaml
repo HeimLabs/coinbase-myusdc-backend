@@ -12,8 +12,8 @@ importers:
         specifier: ^5.0.35
         version: 5.0.35(react@18.3.1)
       '@coinbase/coinbase-sdk':
-        specifier: ^0.0.16
-        version: 0.0.16
+        specifier: ^0.4.0
+        version: 0.4.0
       axios:
         specifier: ^1.6.5
         version: 1.7.7
@@ -87,8 +87,8 @@ packages:
     resolution: {integrity: sha512-bDN/nRUD5PFCehQ+Kjdcft0I3b9CIyCcY3OBNDSc1L6RQhlXH+J48EtaP/cbRdslb83LJiBPQ2i/gV4VgblzwA==}
     engines: {node: '>=18.17.0'}
 
-  '@coinbase/coinbase-sdk@0.0.16':
-    resolution: {integrity: sha512-VxtEWkAE9Mh9ZzALeHianS9zf+mlpU8tN+2vVKCdhE8pmElX4/dq95GLjZ9NhwKY3LKBfupHV1sBfHpi4dUARg==}
+  '@coinbase/coinbase-sdk@0.4.0':
+    resolution: {integrity: sha512-q8XxYbC1YIoMUce11SzuFj3GgJXqXnot2ipCNm5tv4D0OzuZVKomBk7bpyxwPRlTqCN8wlxlWtK/FxYIJ+Hepw==}
 
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -1075,7 +1075,7 @@ snapshots:
     dependencies:
       csstype: 3.1.1
 
-  '@coinbase/coinbase-sdk@0.0.16':
+  '@coinbase/coinbase-sdk@0.4.0':
     dependencies:
       '@scure/bip32': 1.5.0
       axios: 1.7.7

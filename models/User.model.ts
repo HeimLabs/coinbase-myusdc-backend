@@ -45,3 +45,4 @@ const UserSchema = new mongoose.Schema({
 });
 
 export const UserModel = mongoose.model("User", UserSchema);
+export type UserDocument = mongoose.InferSchemaType<typeof UserSchema> & mongoose.Document;
