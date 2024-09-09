@@ -2,6 +2,7 @@ import { NextFunction, Response, Request } from "express";
 import { UserModel } from "../models/User.model";
 import { Coinbase } from "@coinbase/coinbase-sdk";
 import { coinbase } from "../services";
+import { faucetConfig } from "../config";
 
 export async function handleWebhook(req: Request, res: Response, next: NextFunction) {
     try {
@@ -20,10 +21,11 @@ export async function handleWebhook(req: Request, res: Response, next: NextFunct
             // Wallet Setup
             try {
                 const wallet = await coinbase.createWalletForUser(newUser);
+                const address = (await wallet.getDefaultAddress()).getId()
 
                 // Fund the wallet
                 try {
-                    await coinbase.fundWallet(wallet, Coinbase.assets.Usdc);
+                    await coinbase.fundWallet(address, Coinbase.assets.Usdc, faucetConfig.INITIAL_AMOUNT);
                 } catch (err) {
                     console.error(`[controllers/clerk/handleWebhook] Failed to fund wallet |  User: ${userData.id}`);
                     console.error(err);

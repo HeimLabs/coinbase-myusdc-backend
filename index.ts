@@ -2,7 +2,7 @@ import "dotenv/config";
 import middlewares from "./middlewares";
 import router from "./routes";
 import express from "express";
-import { database } from "./services";
+import { coinbase, database } from "./services";
 import { ServerSigner } from "@coinbase/coinbase-sdk";
 
 const start = async () => {
@@ -12,6 +12,7 @@ const start = async () => {
     app.use(router);
 
     await database.connectToDatabase();
+    await coinbase.setupFaucet();
 
     app.listen(process.env.PORT || 5000, async () => {
         try {

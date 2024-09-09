@@ -41,6 +41,20 @@ const UserSchema = new mongoose.Schema({
                 default: Date.now()
             }
         }
+    },
+    faucet: {
+        type: {
+            amount: {
+                type: Number,
+                default: 0,
+                required: true
+            },
+            lastRequested: {
+                type: Date,
+                required: false
+            },
+        },
+        required: true
     }
 });
 

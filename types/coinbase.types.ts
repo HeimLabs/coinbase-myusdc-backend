@@ -1,13 +1,3 @@
-export interface SeedConfig {
-    [key: string]: {
-        seed: string;
-        encrypted: boolean;
-        authTag: string;
-        iv: string;
-    };
-}
-
-export interface TransformedConfig {
+export interface FaucetConfig {
     walletId: string;
-    seed: string;
 }
