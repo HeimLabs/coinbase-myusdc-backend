@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import AppError from "../utils/appError";
 import { AssetTransferRequest, FundWalletRequest } from "types/api.types";
 import { Coinbase, Wallet } from "@coinbase/coinbase-sdk";
-import { UserModel } from "../models/User.model";
+import { UserDocument, UserModel } from "../models/User.model";
 import { coinbase } from "../services";
 import { clerkClient } from "@clerk/clerk-sdk-node";
 import { faucetConfig } from "../config";
@@ -58,6 +58,8 @@ export async function transferAsset(req: AssetTransferRequest, res: Response, ne
     try {
         const { asset, data } = req.body;
         const { recipient, amount } = data;
+
+        // @todo - transfer to email/address
 
         let user = await UserModel.findOne({ userId: req.auth.userId });
 
@@ -129,6 +131,52 @@ export async function fundWallet(req: FundWalletRequest, res: Response, next: Ne
         return res.status(200).json(user);
     } catch (error) {
         console.error("[controllers/wallet/fundWallet] Funding Failed: ", error);
+        next(error);
+    }
+}
+
+export async function getTransfers(req: Request, res: Response, next: NextFunction) {
+    try {
+        let user = await UserModel.findOne({ userId: req.auth.userId });
+
+        if (!user)
+            throw new AppError(404, "error", "User not found");
+        if (!user.wallet?.id)
+            throw new AppError(404, "error", "Wallet not found");
+
+        const wallet = await Wallet.fetch(user.wallet?.id);
+        const address = await wallet.getDefaultAddress();
+        const _transfers = await address.listTransfers();
+
+        const transfers = [];
+        const addressUserMap = new Map();
+
+        for await (const transfer of _transfers) {
+            const destinationAddress = transfer.getDestinationAddressId();
+            let destinationUser: UserDocument | null;
+
+            if (addressUserMap.has(destinationAddress)) {
+                destinationUser = addressUserMap.get(destinationAddress);
+            } else {
+                destinationUser = await UserModel.findOne({ wallet: { address: destinationAddress } });
+                addressUserMap.set(destinationAddress, destinationUser);
+            }
+
+            transfers.push({
+                id: transfer.getId(),
+                destinationAddress: transfer.getDestinationAddressId(),
+                destinationUser: destinationUser ? destinationUser : null,
+                assetId: transfer.getAssetId(),
+                amount: transfer.getAmount().toNumber(),
+                transactionLink: transfer.getTransactionLink(),
+                status: transfer.getStatus()
+            });
+        }
+
+        return res.status(200).json({ transfers });
+    } catch (error) {
+        console.error(`[controllers/wallet/getTransfers] Failed to get transfers`);
+        console.error(error);
         next(error);
     }
 }
