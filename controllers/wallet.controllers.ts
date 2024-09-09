@@ -158,7 +158,7 @@ export async function getTransfers(req: Request, res: Response, next: NextFuncti
             if (addressUserMap.has(destinationAddress)) {
                 destinationUser = addressUserMap.get(destinationAddress);
             } else {
-                destinationUser = await UserModel.findOne({ wallet: { address: destinationAddress } });
+                destinationUser = await UserModel.findOne({ 'wallet.address': { $regex: new RegExp(destinationAddress, 'i') } });
                 addressUserMap.set(destinationAddress, destinationUser);
             }
 
@@ -181,3 +181,42 @@ export async function getTransfers(req: Request, res: Response, next: NextFuncti
     }
 }
 
+export async function getRecentContacts(req: Request, res: Response, next: NextFunction) {
+    try {
+        let user = await UserModel.findOne({ userId: req.auth.userId });
+
+        if (!user)
+            throw new AppError(404, "error", "User not found");
+        if (!user.wallet?.id)
+            throw new AppError(404, "error", "Wallet not found");
+
+        const wallet = await Wallet.fetch(user.wallet?.id);
+        const address = await wallet.getDefaultAddress();
+        const _transfers = await address.listTransfers();
+
+        const uniqueDestinations = new Map();
+
+        for await (const transfer of _transfers) {
+            const destinationAddress = transfer.getDestinationAddressId();
+
+            if (!uniqueDestinations.has(destinationAddress)) {
+                const destinationUser = await UserModel.findOne({ 'wallet.address': { $regex: new RegExp(destinationAddress, 'i') } });
+
+                uniqueDestinations.set(destinationAddress, {
+                    destinationAddress: destinationAddress,
+                    destinationUser: destinationUser || null,
+                });
+            }
+
+            if (uniqueDestinations.size >= 5) break;
+        }
+
+        const recentContacts = Array.from(uniqueDestinations.values())
+
+        return res.status(200).json({ recentContacts });
+    } catch (error) {
+        console.error(`[controllers/wallet/getRecentContacts] Failed to get recent contacts`);
+        console.error(error);
+        next(error);
+    }
+}
