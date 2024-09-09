@@ -113,6 +113,9 @@ export async function fundWallet(req: FundWalletRequest, res: Response, next: Ne
         if ((user.faucet.amount + amount) > faucetConfig.MAX_TOTAL_AMOUNT)
             throw new AppError(400, "error", "Limit exceeded");
 
+        if((user.wallet.usdBalance - amount) <= 0)
+            throw new AppError(400, "error", "Insufficient USD");
+
         if (user.faucet.lastRequested) {
             const now = new Date();
             const timeSinceLastRequest = (now.getTime() - user.faucet.lastRequested?.getTime()) / 1000;
@@ -125,6 +128,7 @@ export async function fundWallet(req: FundWalletRequest, res: Response, next: Ne
 
         await coinbase.fundWallet(user.wallet.address as string, asset, amount);
 
+        user.wallet.usdBalance -= amount;
         user.faucet.lastRequested = new Date();
         await user.save();
 
