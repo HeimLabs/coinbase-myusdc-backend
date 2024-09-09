@@ -8,7 +8,8 @@ const router = Router();
 router.get("/", healthCheck);
 
 router.use("/wallet", walletRouter);
-router.use("/clerk", clerkRouter);
+// @review - Any benefit to keeping webhook?
+// router.use("/clerk", clerkRouter);
 
 router.all("*", notFound);
 

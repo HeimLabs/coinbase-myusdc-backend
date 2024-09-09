@@ -4,17 +4,25 @@ import { AssetTransferRequest } from "types/api.types";
 import { Coinbase } from "@coinbase/coinbase-sdk";
 import { UserModel } from "../models/User.model";
 import { coinbase } from "../services";
+import { clerkClient } from "@clerk/clerk-sdk-node";
 
 export async function getUser(req: Request, res: Response, next: NextFunction) {
     try {
         let user = await UserModel.findOne({ userId: req.auth.userId });
 
-        if (!user)
-            throw new AppError(404, "error", "User not found");
+        const _user = await clerkClient.users.getUser(req.auth.userId);
 
-        // @review - If user doesn't exist? Create User?
-        // @review - ONLY Create user here instead of webhook?
-        
+        // If user doesn't exist, create user
+        if (!user) {
+            user = await (new UserModel({
+                userId: _user.id,
+                name: _user.firstName,
+                email: _user.primaryEmailAddress,
+                imageUrl: _user.imageUrl,
+                wallet: {}
+            })).save();
+        }
+
         // If wallet doesn't exist, create wallet
         if (!user.wallet) {
             try {
