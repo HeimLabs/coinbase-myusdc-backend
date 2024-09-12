@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import AppError from "../utils/appError";
 import { AssetTransferRequest, FundWalletRequest } from "types/api.types";
-import { Coinbase, Wallet } from "@coinbase/coinbase-sdk";
+import { Coinbase, ExternalAddress, Wallet } from "@coinbase/coinbase-sdk";
 import { UserDocument, UserModel } from "../models/User.model";
 import { coinbase } from "../services";
 import { clerkClient } from "@clerk/clerk-sdk-node";
@@ -19,7 +19,7 @@ export async function getUser(req: Request, res: Response, next: NextFunction) {
         if (!user) {
             user = await (new UserModel({
                 userId: _user.id,
-                name: _user.firstName,
+                name: (_user.firstName || "") + (_user.lastName ? " " + _user.lastName : ""),
                 email: _user.primaryEmailAddress?.emailAddress,
                 imageUrl: _user.imageUrl,
                 wallet: {},
@@ -42,6 +42,28 @@ export async function getUser(req: Request, res: Response, next: NextFunction) {
                 }
             } catch (err) {
                 console.error(`[controllers/wallet/getUser] Failed to create wallet |  User: ${user?.userId}`);
+                console.error(err);
+            }
+        }
+        // Else, fetch wallet balance
+        else {
+            try {
+                const address = new ExternalAddress(
+                    process.env.APP_ENV === "production"
+                        ? Coinbase.networks.BaseMainnet
+                        : Coinbase.networks.BaseSepolia,
+                    user.wallet.address as string
+                );
+                const usdcBalance = (await address.getBalance(Coinbase.assets.Usdc)).toNumber();
+                user = {
+                    ...user.toJSON(),
+                    wallet: {
+                        ...user.wallet,
+                        usdcBalance: usdcBalance
+                    }
+                } as any;
+            } catch (err) {
+                console.error(`[controllers/wallet/getUser] Failed to fetch balance |  User: ${user?.userId}`);
                 console.error(err);
             }
         }
