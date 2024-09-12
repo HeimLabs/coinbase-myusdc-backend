@@ -84,6 +84,7 @@ export async function transferAsset(req: AssetTransferRequest, res: Response, ne
         // @todo - transfer to email/address
 
         let user = await UserModel.findOne({ userId: req.auth.userId });
+        let destination = await UserModel.findOne({ email: recipient });
 
         if (!user)
             throw new AppError(404, "error", "User not found");
@@ -106,7 +107,9 @@ export async function transferAsset(req: AssetTransferRequest, res: Response, ne
         const transfer = await (await wallet.createTransfer({
             amount: amount,
             assetId: asset,
-            destination: recipient,
+            destination: destination && destination.wallet?.address
+                ? destination.wallet?.address
+                : recipient,
             gasless: asset == Coinbase.assets.Usdc ? true : false,
         })).wait({ timeoutSeconds: 30 });
 
