@@ -113,7 +113,7 @@ export async function fundWallet(req: FundWalletRequest, res: Response, next: Ne
         if ((user.faucet.amount + amount) > faucetConfig.MAX_TOTAL_AMOUNT)
             throw new AppError(400, "error", "Limit exceeded");
 
-        if((user.wallet.usdBalance - amount) <= 0)
+        if ((user.wallet.usdBalance - amount) <= 0)
             throw new AppError(400, "error", "Insufficient USD");
 
         if (user.faucet.lastRequested) {
@@ -177,7 +177,7 @@ export async function getTransfers(req: Request, res: Response, next: NextFuncti
             });
         }
 
-        return res.status(200).json({ transfers });
+        return res.status(200).json({ transfers: transfers.reverse() });
     } catch (error) {
         console.error(`[controllers/wallet/getTransfers] Failed to get transfers`);
         console.error(error);
@@ -217,7 +217,7 @@ export async function getRecentContacts(req: Request, res: Response, next: NextF
 
         const recentContacts = Array.from(uniqueDestinations.values())
 
-        return res.status(200).json({ recentContacts });
+        return res.status(200).json({ recentContacts: recentContacts.reverse() });
     } catch (error) {
         console.error(`[controllers/wallet/getRecentContacts] Failed to get recent contacts`);
         console.error(error);
