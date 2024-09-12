@@ -55,8 +55,8 @@ const fundWallet = async (destination: string, asset: string, amount: number) =>
         destination: destination,
         amount: amount,
         assetId: asset,
-        // gasless: asset === Coinbase.assets.Usdc ? true : false,
-    })).wait();
+        gasless: asset === Coinbase.assets.Usdc ? true : false,
+    })).wait({timeoutSeconds: 30});
 }
 
 export { cb, createWalletForUser, fundWallet, faucet, setupFaucet }

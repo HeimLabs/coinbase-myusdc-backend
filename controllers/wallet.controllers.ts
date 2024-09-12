@@ -86,7 +86,7 @@ export async function transferAsset(req: AssetTransferRequest, res: Response, ne
             assetId: asset,
             destination: recipient,
             gasless: asset == Coinbase.assets.Usdc ? true : false,
-        })).wait();
+        })).wait({ timeoutSeconds: 30 });
 
         return res.status(200).json({
             transactionLink: transfer.getTransactionLink(),
