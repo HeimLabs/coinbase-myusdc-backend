@@ -55,6 +55,20 @@ export async function getUser(req: Request, res: Response, next: NextFunction) {
                     user.wallet.address as string
                 );
                 const usdcBalance = (await address.getBalance(Coinbase.assets.Usdc)).toNumber();
+
+                // Calculate and update rewards
+                const apyRate = 3; // 3% APY
+                const currentDate = new Date();
+                const lastUpdated = user.wallet.rewards?.lastUpdated || new Date();
+                const timeDifference = currentDate.getTime() - new Date(lastUpdated).getTime();
+                const daysSinceLastUpdate = timeDifference / (1000 * 60 * 60 * 24);
+                const rewardEarned = (usdcBalance * apyRate * daysSinceLastUpdate) / (100 * 365);
+
+                user.wallet.rewards.amount += rewardEarned;
+                user.wallet.rewards.lastUpdated = currentDate;
+
+                user = await user.save();
+
                 user = {
                     ...user.toJSON(),
                     wallet: {

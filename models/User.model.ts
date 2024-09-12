@@ -32,14 +32,17 @@ const UserSchema = new mongoose.Schema({
             default: 1200
         },
         rewards: {
-            amount: {
-                type: Number,
-                default: 0
+            type: {
+                amount: {
+                    type: Number,
+                    default: 0
+                },
+                lastUpdated: {
+                    type: Date,
+                    default: Date.now()
+                }
             },
-            lastUpdated: {
-                type: Date,
-                default: Date.now()
-            }
+            required: true
         }
     },
     faucet: {
