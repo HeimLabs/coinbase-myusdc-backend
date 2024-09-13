@@ -45,8 +45,9 @@ export async function getUser(req: Request, res: Response, next: NextFunction) {
                 console.error(err);
             }
         }
-        // Else, fetch wallet balance
-        else {
+
+        // If wallet exists, fetch wallet balance & calculate reward
+        if(user.wallet?.address) {
             try {
                 const address = new ExternalAddress(
                     process.env.APP_ENV === "production"
