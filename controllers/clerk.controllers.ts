@@ -20,8 +20,8 @@ export async function handleWebhook(req: Request, res: Response, next: NextFunct
 
             // Wallet Setup
             try {
-                const wallet = await coinbase.createWalletForUser(newUser);
-                const address = (await wallet.getDefaultAddress()).getId()
+                const user = await coinbase.createWalletForUser(newUser);
+                const address = user.wallet?.address as string;
 
                 // Fund the wallet
                 try {
