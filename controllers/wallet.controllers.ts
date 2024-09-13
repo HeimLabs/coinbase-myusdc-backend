@@ -22,7 +22,7 @@ export async function getUser(req: Request, res: Response, next: NextFunction) {
                 name: (_user.firstName || "") + (_user.lastName ? " " + _user.lastName : ""),
                 email: _user.primaryEmailAddress?.emailAddress,
                 imageUrl: _user.imageUrl,
-                wallet: {},
+                wallet: { rewards: {} },
                 faucet: {}
             })).save();
         }
