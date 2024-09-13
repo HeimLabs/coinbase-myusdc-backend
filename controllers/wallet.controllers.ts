@@ -9,7 +9,7 @@ import { faucetConfig } from "../config";
 
 export async function getUser(req: Request, res: Response, next: NextFunction) {
     try {
-        let user = await UserModel.findOne({ userId: req.auth.userId });
+        let user: UserDocument | null = await UserModel.findOne({ userId: req.auth.userId });
 
         const _user = await clerkClient.users.getUser(req.auth.userId);
 
@@ -30,8 +30,8 @@ export async function getUser(req: Request, res: Response, next: NextFunction) {
         // If wallet doesn't exist, create wallet
         if (!user.wallet?.id) {
             try {
-                const wallet = await coinbase.createWalletForUser(user);
-                const address = (await wallet.getDefaultAddress()).getId()
+                 user = await coinbase.createWalletForUser(user);
+                const address = user?.wallet?.address as string;
 
                 // Fund the wallet
                 try {

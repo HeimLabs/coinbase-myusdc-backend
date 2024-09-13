@@ -15,10 +15,8 @@ const createWalletForUser = async (user: UserDocument) => {
     if (user.wallet) {
         user.wallet.id = wallet.getId();
         user.wallet.address = (await wallet.getDefaultAddress()).getId();
-        await user.save();
     }
-
-    return wallet;
+    return (await user.save());
 }
 
 // FAUCET
