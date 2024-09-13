@@ -168,6 +168,7 @@ export async function fundWallet(req: FundWalletRequest, res: Response, next: Ne
         await coinbase.fundWallet(user.wallet.address as string, asset, amount);
 
         user.wallet.usdBalance -= amount;
+        user.faucet.amount += amount;
         user.faucet.lastRequested = new Date();
         await user.save();
 
