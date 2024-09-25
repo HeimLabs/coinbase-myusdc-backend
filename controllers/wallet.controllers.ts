@@ -17,9 +17,12 @@ export async function getUser(req: Request, res: Response, next: NextFunction) {
 
         // If user doesn't exist, create user
         if (!user) {
+            const _name = (!_user.firstName && !_user.lastName)
+                ? _user.primaryEmailAddress?.emailAddress.split('@')[0]
+                : (_user.firstName || "") + (_user.lastName ? " " + _user.lastName : "")
             user = await (new UserModel({
                 userId: _user.id,
-                name: (_user.firstName || "") + (_user.lastName ? " " + _user.lastName : ""),
+                name: _name,
                 email: _user.primaryEmailAddress?.emailAddress,
                 imageUrl: _user.imageUrl,
                 wallet: { rewards: {} },
@@ -30,7 +33,7 @@ export async function getUser(req: Request, res: Response, next: NextFunction) {
         // If wallet doesn't exist, create wallet
         if (!user.wallet?.id) {
             try {
-                 user = await coinbase.createWalletForUser(user);
+                user = await coinbase.createWalletForUser(user);
                 const address = user?.wallet?.address as string;
 
                 // Fund the wallet
@@ -47,7 +50,7 @@ export async function getUser(req: Request, res: Response, next: NextFunction) {
         }
 
         // If wallet exists, fetch wallet balance & calculate reward
-        if(user.wallet?.address) {
+        if (user.wallet?.address) {
             try {
                 const address = new ExternalAddress(
                     process.env.APP_ENV === "production"
