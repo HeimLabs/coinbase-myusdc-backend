@@ -1,7 +1,7 @@
-// Maximum faucet request amount
+// Maximum faucet request amount - Total
 export const MAX_TOTAL_AMOUNT = 100;
 
-// Maximum faucet request amount
+// Maximum faucet request amount - Per Request
 export const MAX_REQUEST_AMOUNT = 10;
 
 // Duration (in epochs) between faucet requests

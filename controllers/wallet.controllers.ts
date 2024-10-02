@@ -13,8 +13,6 @@ export async function getUser(req: Request, res: Response, next: NextFunction) {
 
         const _user = await clerkClient.users.getUser(req.auth.userId);
 
-        // @todo - Update reward
-
         // If user doesn't exist, create user
         if (!user) {
             const _name = (!_user.firstName && !_user.lastName)
@@ -98,8 +96,6 @@ export async function transferAsset(req: AssetTransferRequest, res: Response, ne
     try {
         const { asset, data } = req.body;
         const { recipient, amount } = data;
-
-        // @todo - transfer to email/address
 
         let user = await UserModel.findOne({ userId: req.auth.userId });
         let destination = await UserModel.findOne({ email: recipient });

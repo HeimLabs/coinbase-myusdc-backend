@@ -19,8 +19,6 @@ pnpm i
 - Fill in the environment variables in the `.env` file, refer to the `.env.example` file for the required variables.
 - Create a [CDP API key](https://portal.cdp.coinbase.com/access/api) and save it as `cdp_api_key.json` in the root of the repository, refer to [cdp_api_key.example.json](./cdp_api_key.example.json).
 
-> TODO: Clerk Setup Docs - Webhook + Keys
-
 ---
 ### Usage `(in development mode)`
 
